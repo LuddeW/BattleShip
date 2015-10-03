@@ -11,6 +11,12 @@ namespace BattleShip
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D WaterTile;
+        Texture2D ShipTile;
+        Ships ShipTiles = new Ships(new Rectangle(0, 0, 50, 100));
+        Tiles WaterTiles = new Tiles(new Rectangle(0, 0, 50, 50));
+        Tiles[,] tiles;
+        
 
         public Game1()
         {
@@ -26,7 +32,11 @@ namespace BattleShip
         /// </summary>
         protected override void Initialize()
         {
+            IsMouseVisible = true;  
             // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = 500;
+            graphics.PreferredBackBufferHeight = 500;
+            graphics.ApplyChanges();
 
             base.Initialize();
         }
@@ -39,7 +49,10 @@ namespace BattleShip
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            WaterTile = Content.Load<Texture2D>(@"watertile");
+            ShipTile = Content.Load<Texture2D>(@"ship2x2");
+            tiles = new Tiles[10, 10];
+            CreatTileArray();
             // TODO: use this.Content to load your game content here
         }
 
@@ -73,11 +86,34 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            GraphicsDevice.Clear(Color.White);
+            spriteBatch.Begin();
+            DrawWaterTiles();
+            ShipTiles.Draw(spriteBatch, ShipTile);
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+        protected void DrawWaterTiles ()
+        {
+            for (int i = 0; i < tiles.GetLength(0); i++)
+            {
+                for (int j = 0; j < tiles.GetLength(1); j++)
+                {
+                    tiles[i, j].DrawWater(spriteBatch, WaterTile);
+                }
+            }
+        }
+        protected void CreatTileArray()
+        {
+            for (int i = 0; i < tiles.GetLength(0); i++)
+            {
+                for (int k = 0; k < tiles.GetLength(1); k++)
+                {
+                    tiles[i, k] = new Tiles(new Rectangle(i * 50, k * 50, 50, 50));
+                }
+            }
         }
     }
 }
