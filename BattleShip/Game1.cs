@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace BattleShip
 {
@@ -9,6 +10,9 @@ namespace BattleShip
     /// </summary>
     public class Game1 : Game
     {
+
+        const int TILE_SIZE = 50;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D WaterTileTexture;
@@ -18,7 +22,7 @@ namespace BattleShip
         Texture2D HangarshipTexture;
         Tile[,] Tiles;
         Ship[] Ships;
-
+        MouseState PrevMouseState;
 
         public Game1()
         {
@@ -73,6 +77,7 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            CheckMouseInput();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -113,7 +118,7 @@ namespace BattleShip
             {
                 for (int k = 0; k < Tiles.GetLength(1); k++)
                 {
-                    Tiles[i, k] = new Tile(new Rectangle(i * 50, k * 50, 50, 50), WaterTileTexture);
+                    Tiles[i, k] = new Tile(new Rectangle(i * TILE_SIZE, k * TILE_SIZE, 1 * TILE_SIZE, 1 * TILE_SIZE), WaterTileTexture);
                 }
             }
         }
@@ -129,10 +134,10 @@ namespace BattleShip
         {
             Ships = new Ship[]
             {
-                new Ship(new Rectangle(0, 0, 50, 100), DestroyerTexture), //Destroyer
-                new Ship(new Rectangle(50, 50, 50, 150), SubmarineTexture), //Submarine
-                new Ship(new Rectangle(100, 0, 50, 200), BattleshipTexture), // Battleship
-                new Ship(new Rectangle(150, 0, 50, 250), HangarshipTexture) // Hangarship
+                new Ship(new Rectangle(0 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 2 * TILE_SIZE), DestroyerTexture), //Destroyer
+                new Ship(new Rectangle(1 * TILE_SIZE, 1 * TILE_SIZE, 1 * TILE_SIZE, 3 * TILE_SIZE), SubmarineTexture), //Submarine
+                new Ship(new Rectangle(2 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 4 * TILE_SIZE), BattleshipTexture), // Battleship
+                new Ship(new Rectangle(3 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 5 * TILE_SIZE), HangarshipTexture) // Hangarship
             };
 
         }
@@ -142,6 +147,34 @@ namespace BattleShip
             {
                 Ships[i].Draw(spriteBatch);
             }
+        }
+        private void CheckMouseInput()
+        {
+            MouseState mouseState = Mouse.GetState();
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (IsPointInAnyShip(mouseState.Position))
+                {
+                    Console.WriteLine("Clicked on ship");
+                }
+                
+            }
+            
+
+            PrevMouseState = mouseState;
+        }
+        private bool IsPointInAnyShip(Point Point)
+        {
+
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                if (Ships[i].IsPointInShip(Point))
+                {
+                   return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -16,12 +16,17 @@ namespace BattleShip
         {
             this.ShipRectangle = ShipRectangle;
             this.ShipTexture = ShipTexture;
+            Console.WriteLine("Ship Created");
+
         }
         public void Draw(SpriteBatch sb)
         {
             sb.Draw(ShipTexture, ShipRectangle, Color.White);
             
         }
-
+        public bool IsPointInShip(Point Position)
+        {   
+            return ShipRectangle.Contains(Position);               
+        }
     }
 }
