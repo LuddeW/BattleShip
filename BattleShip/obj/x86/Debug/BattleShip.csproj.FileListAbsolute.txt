@@ -25,3 +25,6 @@ C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\Battle
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\obj\x86\Debug\BattleShip.pdb
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\watertile.xnb
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship2x2.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship3x3.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship4x4.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship5x5.xnb

@@ -8,21 +8,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BattleShip
 {
-    class Tiles
+    class Tile
     {
         Rectangle WaterRect;
+        Texture2D WaterTile;
         
-        public Tiles(Rectangle TileRectangle)
+        public Tile(Rectangle TileRectangle, Texture2D WaterTile)
         {
             WaterRect = TileRectangle;
+            this.WaterTile = WaterTile;
         }
-        public void DrawWater(SpriteBatch sb, Texture2D WaterTile)
+        public void DrawWater(SpriteBatch sb)
         {
             sb.Draw(WaterTile, WaterRect, Color.White);
         }
-       /* public void DrawShips(Ships Ship, SpriteBatch sb)
-        {
-            Ship.Draw();
-        }*/
     }
 }

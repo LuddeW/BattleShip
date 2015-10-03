@@ -38,8 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Ships.cs" />
-    <Compile Include="Tiles.cs" />
+    <Compile Include="Ship.cs" />
+    <Compile Include="Tile.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\ship2x2.png" />
+    <Content Include="Content\ship3x3.png" />
+    <Content Include="Content\ship4x4.png" />
+    <Content Include="Content\ship5x5.png" />
     <Content Include="Content\watertile.png" />
     <Content Include="Icon.ico" />
   </ItemGroup>

@@ -11,12 +11,14 @@ namespace BattleShip
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D WaterTile;
-        Texture2D ShipTile;
-        Ships ShipTiles = new Ships(new Rectangle(0, 0, 50, 100));
-        Tiles WaterTiles = new Tiles(new Rectangle(0, 0, 50, 50));
-        Tiles[,] tiles;
-        
+        Texture2D WaterTileTexture;
+        Texture2D DestroyerTexture;
+        Texture2D SubmarineTexture;
+        Texture2D BattleshipTexture;
+        Texture2D HangarshipTexture;
+        Tile[,] Tiles;
+        Ship[] Ships;
+
 
         public Game1()
         {
@@ -32,7 +34,7 @@ namespace BattleShip
         /// </summary>
         protected override void Initialize()
         {
-            IsMouseVisible = true;  
+            IsMouseVisible = true;
             // TODO: Add your initialization logic here
             graphics.PreferredBackBufferWidth = 500;
             graphics.PreferredBackBufferHeight = 500;
@@ -49,10 +51,9 @@ namespace BattleShip
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            WaterTile = Content.Load<Texture2D>(@"watertile");
-            ShipTile = Content.Load<Texture2D>(@"ship2x2");
-            tiles = new Tiles[10, 10];
+            LoadPictures();
             CreatTileArray();
+            CreatShips();
             // TODO: use this.Content to load your game content here
         }
 
@@ -89,30 +90,57 @@ namespace BattleShip
             GraphicsDevice.Clear(Color.White);
             spriteBatch.Begin();
             DrawWaterTiles();
-            ShipTiles.Draw(spriteBatch, ShipTile);
+            DrawShips();
             spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }
-        protected void DrawWaterTiles ()
+        protected void DrawWaterTiles()
         {
-            for (int i = 0; i < tiles.GetLength(0); i++)
+            for (int i = 0; i < Tiles.GetLength(0); i++)
             {
-                for (int j = 0; j < tiles.GetLength(1); j++)
+                for (int j = 0; j < Tiles.GetLength(1); j++)
                 {
-                    tiles[i, j].DrawWater(spriteBatch, WaterTile);
+                    Tiles[i, j].DrawWater(spriteBatch);
                 }
             }
         }
         protected void CreatTileArray()
         {
-            for (int i = 0; i < tiles.GetLength(0); i++)
+            Tiles = new Tile[10, 10];
+            for (int i = 0; i < Tiles.GetLength(0); i++)
             {
-                for (int k = 0; k < tiles.GetLength(1); k++)
+                for (int k = 0; k < Tiles.GetLength(1); k++)
                 {
-                    tiles[i, k] = new Tiles(new Rectangle(i * 50, k * 50, 50, 50));
+                    Tiles[i, k] = new Tile(new Rectangle(i * 50, k * 50, 50, 50), WaterTileTexture);
                 }
+            }
+        }
+        private void LoadPictures()
+        {
+            WaterTileTexture = Content.Load<Texture2D>(@"watertile");
+            DestroyerTexture = Content.Load<Texture2D>(@"ship2x2");
+            SubmarineTexture = Content.Load<Texture2D>(@"ship3x3");
+            BattleshipTexture = Content.Load<Texture2D>(@"ship4x4");
+            HangarshipTexture = Content.Load<Texture2D>(@"ship5x5");
+        }
+        private void CreatShips()
+        {
+            Ships = new Ship[]
+            {
+                new Ship(new Rectangle(0, 0, 50, 100), DestroyerTexture), //Destroyer
+                new Ship(new Rectangle(50, 50, 50, 150), SubmarineTexture), //Submarine
+                new Ship(new Rectangle(100, 0, 50, 200), BattleshipTexture), // Battleship
+                new Ship(new Rectangle(150, 0, 50, 250), HangarshipTexture) // Hangarship
+            };
+
+        }
+        private void DrawShips()
+        {
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                Ships[i].Draw(spriteBatch);
             }
         }
     }
