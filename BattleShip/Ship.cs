@@ -12,21 +12,46 @@ namespace BattleShip
 
         Rectangle ShipRectangle;
         Texture2D ShipTexture;
+        int lives;
+        bool isvisible;
         public Ship(Rectangle ShipRectangle, Texture2D ShipTexture)        
         {
             this.ShipRectangle = ShipRectangle;
-            this.ShipTexture = ShipTexture;
+            this.ShipTexture = ShipTexture;            
             Console.WriteLine("Ship Created");
-
+            lives = ShipRectangle.Height / 50;
         }
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(ShipTexture, ShipRectangle, Color.White);
-            
+            Visible();
+            if (isvisible)
+            {
+                sb.Draw(ShipTexture, ShipRectangle, Color.White);
+            }
+                          
         }
         public bool IsPointInShip(Point Position)
         {   
-            return ShipRectangle.Contains(Position);               
+            return ShipRectangle.Contains(Position);
+            
+                   
+        }
+        public void Visible()
+        {
+            if (lives <= 0)
+            {
+                isvisible = true;
+                              
+            }
+            else
+            {
+                isvisible = false;
+            }
+        }
+        public void LoseLife()
+        {
+            lives--;
+            
         }
     }
 }

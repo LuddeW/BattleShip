@@ -23,6 +23,7 @@ namespace BattleShip
         Tile[,] Tiles;
         Ship[] Ships;
         MouseState PrevMouseState;
+        
 
         public Game1()
         {
@@ -134,18 +135,21 @@ namespace BattleShip
         {
             Ships = new Ship[]
             {
+
                 new Ship(new Rectangle(0 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 2 * TILE_SIZE), DestroyerTexture), //Destroyer
-                new Ship(new Rectangle(1 * TILE_SIZE, 1 * TILE_SIZE, 1 * TILE_SIZE, 3 * TILE_SIZE), SubmarineTexture), //Submarine
+                new Ship(new Rectangle(1 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 3 * TILE_SIZE), SubmarineTexture), //Submarine
                 new Ship(new Rectangle(2 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 4 * TILE_SIZE), BattleshipTexture), // Battleship
-                new Ship(new Rectangle(3 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 5 * TILE_SIZE), HangarshipTexture) // Hangarship
+                new Ship(new Rectangle(3 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 5 * TILE_SIZE), HangarshipTexture)// Hangarship
             };
 
         }
         private void DrawShips()
         {
+            
+            
             for (int i = 0; i < Ships.Length; i++)
-            {
-                Ships[i].Draw(spriteBatch);
+            {                
+                    Ships[i].Draw(spriteBatch);   
             }
         }
         private void CheckMouseInput()
@@ -157,6 +161,10 @@ namespace BattleShip
                 if (IsPointInAnyShip(mouseState.Position))
                 {
                     Console.WriteLine("Clicked on ship");
+                    for (int i = 0; i < Ships.Length; i++)
+                    {
+                        Ships[i].LoseLife();
+                    }
                 }
                 
             }
