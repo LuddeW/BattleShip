@@ -78,7 +78,7 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            CheckMouseInput();
+            HandleMouseInput();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -152,7 +152,7 @@ namespace BattleShip
                     Ships[i].Draw(spriteBatch);   
             }
         }
-        private void CheckMouseInput()
+        private void HandleMouseInput()
         {
             MouseState mouseState = Mouse.GetState();
 
@@ -161,10 +161,8 @@ namespace BattleShip
                 if (IsPointInAnyShip(mouseState.Position))
                 {
                     Console.WriteLine("Clicked on ship");
-                    for (int i = 0; i < Ships.Length; i++)
-                    {
-                        Ships[i].LoseLife();
-                    }
+                    GetShipWithPointInsideIt(mouseState.Position).LoseLife();
+                    
                 }
                 
             }
@@ -183,6 +181,17 @@ namespace BattleShip
                 }
             }
             return false;
+        }
+        private Ship GetShipWithPointInsideIt(Point Point)
+        {
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                if (Ships[i].IsPointInShip(Point))
+                {
+                    return Ships[i] ;
+                }
+            }
+            return null;
         }
     }
 }

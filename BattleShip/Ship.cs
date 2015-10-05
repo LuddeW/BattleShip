@@ -50,8 +50,7 @@ namespace BattleShip
         }
         public void LoseLife()
         {
-            lives--;
-            
+            lives--;            
         }
     }
 }
