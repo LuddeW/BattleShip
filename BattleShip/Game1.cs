@@ -42,7 +42,7 @@ namespace BattleShip
             IsMouseVisible = true;
             // TODO: Add your initialization logic here
             graphics.PreferredBackBufferWidth = 500;
-            graphics.PreferredBackBufferHeight = 500;
+            graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
 
             base.Initialize();
@@ -93,7 +93,7 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
             DrawWaterTiles();
             DrawShips();
