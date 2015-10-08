@@ -10,10 +10,13 @@ namespace BattleShip
 {
     class Tile
     {
-        Rectangle WaterRect;
+        public Rectangle WaterRect;
         Texture2D WaterTile;
         Texture2D Explosion;
         Texture2D Splash;
+        public bool Clicked;
+        public bool Explos ;
+        
 
         public Tile(Rectangle TileRectangle, Texture2D WaterTile, Texture2D Explosion, Texture2D Splash)
         {
@@ -25,6 +28,7 @@ namespace BattleShip
         public void DrawWater(SpriteBatch sb)
         {
             sb.Draw(WaterTile, WaterRect, Color.White);
+            
         }
         public bool IsPointInTile(Point Position)
         {
@@ -44,6 +48,7 @@ namespace BattleShip
         public void DrawSplash(SpriteBatch sb)
         {
             sb.Draw(Splash, WaterRect, Color.White);
+            
         }
     }
 }

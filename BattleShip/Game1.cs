@@ -30,9 +30,7 @@ namespace BattleShip
         Radar Radar = new Radar();
         Clock Clock = new Clock();
         MouseState PrevMouseState;
-        bool Explosions = false;
         int Bombs = 0;
-        
 
         public Game1()
         {
@@ -184,18 +182,38 @@ namespace BattleShip
             MouseState mouseState = Mouse.GetState();
             if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && IsPointInAnyTile(mouseState.Position))
             {
-                Explosions = false;
+                
                 Bombs++;
                 LastClickedTile = GetTileWithPointInside(mouseState.Position);
-                
+                for (int i = 0; i < Tiles.GetLength(0); i++)
+                {
+                    for (int k = 0; k < Tiles.GetLength(1); k++)
+                    {
+                        if (Tiles [i, k].WaterRect.Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                        {
+                            Tiles[i, k].Clicked = true;
+                            Tiles[i, k].Explos = false;
+                        }
+                        
+                    }
+                }
                 if (IsPointInAnyShip(mouseState.Position))
                 {
-                    Explosions = true;
+                   
                     Console.WriteLine("Clicked on ship");
                     GetShipWithPointInsideIt(mouseState.Position).LoseLife();
-
-                }
-                
+                    for (int i = 0; i < Tiles.GetLength(0); i++)
+                    {
+                        for (int k = 0; k < Tiles.GetLength(1); k++)
+                        {
+                            if (Tiles[i, k].WaterRect.Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                            {
+                                Tiles[i, k].Clicked = true;
+                                Tiles[i, k].Explos = true;
+                            }
+                        }
+                    }
+                }                
             }
             PrevMouseState = mouseState;
         }
@@ -218,6 +236,7 @@ namespace BattleShip
                 if (Ships[i].IsPointInShip(Point))
                 {
                     return Ships[i] ;
+
                 }
             }
             return null;
@@ -253,17 +272,23 @@ namespace BattleShip
         }
         private void DrawTileStatus()
         {
-            if (Explosions)
+            for (int i = 0; i < Tiles.GetLength(0); i++)
             {
-                LastClickedTile.DrawExplosion(spriteBatch);
-            }
-            else if(!Explosions)
-            {
-                if (LastClickedTile != null)
+                for (int k = 0; k < Tiles.GetLength(1); k++)
                 {
-                    LastClickedTile.DrawSplash(spriteBatch);
-                }                
-            }           
+                    if (Tiles[i, k].Explos == true && Tiles[i, k].Clicked == true)
+                    {
+                        Tiles[i, k].DrawExplosion(spriteBatch);
+                    }
+                    else if (Tiles[i, k].Explos == false)
+                    {
+                        if (LastClickedTile != null && Tiles[i, k].Clicked == true)
+                        {
+                            Tiles[i, k].DrawSplash(spriteBatch);
+                        }
+                    }
+                }
+            }         
         }
         private int Random()
         {
