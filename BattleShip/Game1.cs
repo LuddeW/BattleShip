@@ -20,9 +20,18 @@ namespace BattleShip
         Texture2D SubmarineTexture;
         Texture2D BattleshipTexture;
         Texture2D HangarshipTexture;
+        Texture2D Splash;
+        Texture2D Explosion;
+        Texture2D Radar_Sheet;
+        SpriteFont HudFont;
+        Tile LastClickedTile = null;
         Tile[,] Tiles;
         Ship[] Ships;
+        Radar Radar = new Radar();
+        Clock Clock = new Clock();
         MouseState PrevMouseState;
+        bool Explosions = false;
+        int Bombs = 0;
         
 
         public Game1()
@@ -57,6 +66,7 @@ namespace BattleShip
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             LoadPictures();
+            LoadFonts();
             CreatTileArray();
             CreatShips();
             // TODO: use this.Content to load your game content here
@@ -83,7 +93,7 @@ namespace BattleShip
                 Exit();
 
             // TODO: Add your update logic here
-
+            Clock.AddTime((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
@@ -97,6 +107,9 @@ namespace BattleShip
             spriteBatch.Begin();
             DrawWaterTiles();
             DrawShips();
+            DrawTileStatus();
+            DrawFonts();
+            Radar.Draw(spriteBatch, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
             spriteBatch.End();
             // TODO: Add your drawing code here
 
@@ -106,9 +119,9 @@ namespace BattleShip
         {
             for (int i = 0; i < Tiles.GetLength(0); i++)
             {
-                for (int j = 0; j < Tiles.GetLength(1); j++)
+                for (int k = 0; k < Tiles.GetLength(1); k++)
                 {
-                    Tiles[i, j].DrawWater(spriteBatch);
+                    Tiles[i, k].DrawWater(spriteBatch);
                 }
             }
         }
@@ -119,7 +132,7 @@ namespace BattleShip
             {
                 for (int k = 0; k < Tiles.GetLength(1); k++)
                 {
-                    Tiles[i, k] = new Tile(new Rectangle(i * TILE_SIZE, k * TILE_SIZE, 1 * TILE_SIZE, 1 * TILE_SIZE), WaterTileTexture);
+                    Tiles[i, k] = new Tile(new Rectangle(i * TILE_SIZE, k * TILE_SIZE, 1 * TILE_SIZE, 1 * TILE_SIZE), WaterTileTexture, Explosion, Splash);
                 }
             }
         }
@@ -130,13 +143,22 @@ namespace BattleShip
             SubmarineTexture = Content.Load<Texture2D>(@"ship3x3");
             BattleshipTexture = Content.Load<Texture2D>(@"ship4x4");
             HangarshipTexture = Content.Load<Texture2D>(@"ship5x5");
+            Splash = Content.Load<Texture2D>(@"splash");
+            Explosion = Content.Load<Texture2D>(@"explosion");
+            Radar_Sheet = Content.Load<Texture2D>(@"radar_spritesheet");
+
+        }
+        private void LoadFonts()
+        {
+            HudFont = Content.Load<SpriteFont>(@"HUDFont");
         }
         private void CreatShips()
         {
+            
             Ships = new Ship[]
             {
 
-                new Ship(new Rectangle(0 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 2 * TILE_SIZE), DestroyerTexture), //Destroyer
+                new Ship(new Rectangle(Random() * TILE_SIZE, Random() * TILE_SIZE, 1 * TILE_SIZE, 2 * TILE_SIZE), DestroyerTexture), //Destroyer
                 new Ship(new Rectangle(1 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 3 * TILE_SIZE), SubmarineTexture), //Submarine
                 new Ship(new Rectangle(2 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 4 * TILE_SIZE), BattleshipTexture), // Battleship
                 new Ship(new Rectangle(3 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 5 * TILE_SIZE), HangarshipTexture)// Hangarship
@@ -152,22 +174,29 @@ namespace BattleShip
                     Ships[i].Draw(spriteBatch);   
             }
         }
+        private void DrawFonts()
+        {
+            string Bomb = "Bombs droped:" + Bombs;
+            spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, 505), Color.White);
+        }
         private void HandleMouseInput()
         {
             MouseState mouseState = Mouse.GetState();
-
-            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed)
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && IsPointInAnyTile(mouseState.Position))
             {
+                Explosions = false;
+                Bombs++;
+                LastClickedTile = GetTileWithPointInside(mouseState.Position);
+                
                 if (IsPointInAnyShip(mouseState.Position))
                 {
+                    Explosions = true;
                     Console.WriteLine("Clicked on ship");
                     GetShipWithPointInsideIt(mouseState.Position).LoseLife();
-                    
+
                 }
                 
             }
-            
-
             PrevMouseState = mouseState;
         }
         private bool IsPointInAnyShip(Point Point)
@@ -192,6 +221,55 @@ namespace BattleShip
                 }
             }
             return null;
+        }
+        private bool IsPointInAnyTile(Point Point)
+        {
+            for (int i = 0; i < Tiles.GetLength(0); i++)
+            {
+                for (int k = 0; k < Tiles.GetLength(1); k++)
+                {
+                    if (Tiles[i,k].IsPointInTile(Point))
+                    {
+                        return true;
+                    }
+                   
+                }
+            }
+            return false;
+        }
+        private Tile GetTileWithPointInside(Point Point)
+        {
+            for (int i = 0; i < Tiles.GetLength(0); i++)
+            {
+                for (int k = 0; k < Tiles.GetLength(1); k++)
+                {
+                    if (Tiles[i,k].IsPointInTile(Point))
+                    {
+                        return Tiles[i, k];
+                    }
+                }
+            }
+            return null;
+        }
+        private void DrawTileStatus()
+        {
+            if (Explosions)
+            {
+                LastClickedTile.DrawExplosion(spriteBatch);
+            }
+            else if(!Explosions)
+            {
+                if (LastClickedTile != null)
+                {
+                    LastClickedTile.DrawSplash(spriteBatch);
+                }                
+            }           
+        }
+        private int Random()
+        {
+            Random rnd = new Random();
+            int Rndom = rnd.Next(0, 10);
+            return Rndom;
         }
     }
 }

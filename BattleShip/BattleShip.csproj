@@ -38,6 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Clock.cs" />
+    <Compile Include="Radar.cs" />
     <Compile Include="Ship.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Game1.cs" />
@@ -52,15 +54,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\explosion.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\radar_spritesheet.png" />
     <Content Include="Content\ship2x2.png" />
     <Content Include="Content\ship3x3.png" />
     <Content Include="Content\ship4x4.png" />
     <Content Include="Content\ship5x5.png" />
+    <Content Include="Content\splash.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\watertile.png" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\HUDFont.spritefont" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />

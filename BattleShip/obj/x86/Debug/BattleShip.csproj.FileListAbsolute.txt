@@ -28,3 +28,9 @@ C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\Battle
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship3x3.xnb
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship4x4.xnb
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\ship5x5.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\HUDFont.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\explosion.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\splash.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\explosion.png
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\splash.png
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\radar_spritesheet.xnb
