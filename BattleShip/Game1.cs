@@ -14,16 +14,8 @@ namespace BattleShip
         const int TILE_SIZE = 50;
 
         GraphicsDeviceManager graphics;
+        Common common = null;
         SpriteBatch spriteBatch;
-        Texture2D WaterTileTexture;
-        Texture2D DestroyerTexture;
-        Texture2D SubmarineTexture;
-        Texture2D BattleshipTexture;
-        Texture2D HangarshipTexture;
-        Texture2D Splash;
-        Texture2D Explosion;
-        Texture2D Radar_Sheet;
-        SpriteFont HudFont;
         Tile LastClickedTile = null;
         Tile[,] Tiles;
         Ship[] Ships;
@@ -36,6 +28,7 @@ namespace BattleShip
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            common = new Common(Content);
         }
 
         /// <summary>
@@ -63,9 +56,9 @@ namespace BattleShip
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            LoadPictures();
-            LoadFonts();
-            CreatTileArray();
+            common.LoadPictures();
+            common.LoadFonts();
+            CreateTileArray();
             CreatShips();
             // TODO: use this.Content to load your game content here
         }
@@ -123,7 +116,7 @@ namespace BattleShip
                 }
             }
         }
-        protected void CreatTileArray()
+        protected void CreateTileArray()
         {
             Tiles = new Tile[10, 10];
             for (int i = 0; i < Tiles.GetLength(0); i++)
@@ -134,22 +127,7 @@ namespace BattleShip
                 }
             }
         }
-        private void LoadPictures()
-        {
-            WaterTileTexture = Content.Load<Texture2D>(@"watertile");
-            DestroyerTexture = Content.Load<Texture2D>(@"ship2x2");
-            SubmarineTexture = Content.Load<Texture2D>(@"ship3x3");
-            BattleshipTexture = Content.Load<Texture2D>(@"ship4x4");
-            HangarshipTexture = Content.Load<Texture2D>(@"ship5x5");
-            Splash = Content.Load<Texture2D>(@"splash");
-            Explosion = Content.Load<Texture2D>(@"explosion");
-            Radar_Sheet = Content.Load<Texture2D>(@"radar_spritesheet");
-
-        }
-        private void LoadFonts()
-        {
-            HudFont = Content.Load<SpriteFont>(@"HUDFont");
-        }
+ 
         private void CreatShips()
         {
             
@@ -282,7 +260,7 @@ namespace BattleShip
                     }
                     else if (Tiles[i, k].Explos == false)
                     {
-                        if (LastClickedTile != null && Tiles[i, k].Clicked == true)
+                        if (/*LastClickedTile != null &&*/ Tiles[i, k].Clicked == true)
                         {
                             Tiles[i, k].DrawSplash(spriteBatch);
                         }
