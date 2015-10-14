@@ -182,38 +182,25 @@ namespace BattleShip
             MouseState mouseState = Mouse.GetState();
             if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && IsPointInAnyTile(mouseState.Position))
             {
-                
-                Bombs++;
                 LastClickedTile = GetTileWithPointInside(mouseState.Position);
-                for (int i = 0; i < Tiles.GetLength(0); i++)
+                if (!LastClickedTile.Clicked)
                 {
-                    for (int k = 0; k < Tiles.GetLength(1); k++)
-                    {
-                        if (Tiles [i, k].WaterRect.Contains(Mouse.GetState().X, Mouse.GetState().Y))
-                        {
-                            Tiles[i, k].Clicked = true;
-                            Tiles[i, k].Explos = false;
-                        }
-                        
-                    }
-                }
+                    Bombs++;
+                }                             
                 if (IsPointInAnyShip(mouseState.Position))
                 {
-                   
-                    Console.WriteLine("Clicked on ship");
-                    GetShipWithPointInsideIt(mouseState.Position).LoseLife();
-                    for (int i = 0; i < Tiles.GetLength(0); i++)
+                    if (!LastClickedTile.Clicked)
                     {
-                        for (int k = 0; k < Tiles.GetLength(1); k++)
-                        {
-                            if (Tiles[i, k].WaterRect.Contains(Mouse.GetState().X, Mouse.GetState().Y))
-                            {
-                                Tiles[i, k].Clicked = true;
-                                Tiles[i, k].Explos = true;
-                            }
-                        }
+                        
+                        LastClickedTile.Explos = true;
+                        LoseLife();
                     }
-                }                
+                }   
+                else
+                {
+                    LastClickedTile.Explos = false;
+                }
+                LastClickedTile.Clicked = true;
             }
             PrevMouseState = mouseState;
         }
@@ -250,8 +237,7 @@ namespace BattleShip
                     if (Tiles[i,k].IsPointInTile(Point))
                     {
                         return true;
-                    }
-                   
+                    }                   
                 }
             }
             return false;
@@ -295,6 +281,19 @@ namespace BattleShip
             Random rnd = new Random();
             int Rndom = rnd.Next(0, 10);
             return Rndom;
+        }
+        private void LoseLife()
+        {
+            MouseState mouseState = Mouse.GetState();
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                if (IsPointInAnyShip(mouseState.Position))
+                {
+                    GetShipWithPointInsideIt(mouseState.Position).LoseLife();
+                    Console.WriteLine(i);
+                    break;
+                }
+            }
         }
     }
 }
