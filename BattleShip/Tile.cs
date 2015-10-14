@@ -14,6 +14,7 @@ namespace BattleShip
         Texture2D WaterTile;
         Texture2D Explosion;
         Texture2D Splash;
+        Ship ship = null;
         public bool Clicked;
         public bool Explos ;
         
@@ -49,6 +50,15 @@ namespace BattleShip
         {
             sb.Draw(Splash, WaterRect, Color.White);
             
+        }
+
+        public void SetShip(Ship ship)
+        {
+            this.ship = ship;
+        }
+        public bool HasShip()
+        {
+            return ship != null;
         }
     }
 }

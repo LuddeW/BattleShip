@@ -11,7 +11,7 @@ namespace BattleShip
     public class Game1 : Game
     {
 
-        const int TILE_SIZE = 50;
+        public const int TILE_SIZE = 50;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -30,8 +30,12 @@ namespace BattleShip
         Radar Radar = new Radar();
         Clock Clock = new Clock();
         MouseState PrevMouseState;
+        Random rnd;
         int Bombs = 0;
-
+        int TilesWidth = 10;
+        int TilesHeight = 10;
+        int GameAreaWidth;
+        int GameAreaHeight;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -48,9 +52,12 @@ namespace BattleShip
         {
             IsMouseVisible = true;
             // TODO: Add your initialization logic here
+            GameAreaWidth = TilesWidth * TILE_SIZE;
+            GameAreaHeight = TilesHeight * TILE_SIZE;
             graphics.PreferredBackBufferWidth = 500;
             graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
+            rnd = new Random();
 
             base.Initialize();
         }
@@ -153,16 +160,49 @@ namespace BattleShip
         private void CreatShips()
         {
             
-            Ships = new Ship[]
+            Texture2D[] ConfigShip = new Texture2D[]
             {
-
-                new Ship(new Rectangle(Random() * TILE_SIZE, Random() * TILE_SIZE, 1 * TILE_SIZE, 2 * TILE_SIZE), DestroyerTexture), //Destroyer
-                new Ship(new Rectangle(1 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 3 * TILE_SIZE), SubmarineTexture), //Submarine
-                new Ship(new Rectangle(2 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 4 * TILE_SIZE), BattleshipTexture), // Battleship
-                new Ship(new Rectangle(3 * TILE_SIZE, 0 * TILE_SIZE, 1 * TILE_SIZE, 5 * TILE_SIZE), HangarshipTexture)// Hangarship
+                DestroyerTexture, SubmarineTexture, BattleshipTexture, HangarshipTexture, DestroyerTexture
             };
-
+            Ships = new Ship[ConfigShip.Length];
+            for (int i = 0; i < ConfigShip.Length; i++)
+            {
+                bool FoundPosition = false;
+                bool TempVertical = RandomVertical();
+                Point Point = new Point();
+                while (!FoundPosition)
+                {
+                    Point.X = Random();
+                    Point.Y = Random();
+                    FoundPosition = VerifyShipPosition(Point, ConfigShip[i].Height/TILE_SIZE, TempVertical);
+                }
+                
+                Rectangle TempRectangle = new Rectangle(Point.X * TILE_SIZE, Point.Y * TILE_SIZE, ConfigShip[i].Width, ConfigShip[i].Height);
+                
+                Ship ship = new Ship(TempRectangle, ConfigShip[i], TempVertical);
+                Ships.SetValue(ship, i);
+                AddShipToTiles(ship, Point, TempVertical, ConfigShip[i].Height / TILE_SIZE);
+            }
         }
+
+        private void AddShipToTiles (Ship ship, Point Point, bool Vertical, int ShipTiles)
+        {
+            if (Vertical)
+            {
+                for (int i = 0; i < ShipTiles; i++)
+                {
+                    Tiles[Point.X, Point.Y + i].SetShip(ship);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < ShipTiles; i++)
+                {
+                    Tiles[Point.X - ShipTiles + 1 + i, Point.Y].SetShip(ship);
+                }
+            }
+        }
+
         private void DrawShips()
         {
             
@@ -174,7 +214,7 @@ namespace BattleShip
         }
         private void DrawFonts()
         {
-            string Bomb = "Bombs droped:" + Bombs;
+            string Bomb = "Bombs dropped:" + Bombs;
             spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, 505), Color.White);
         }
         private void HandleMouseInput()
@@ -278,9 +318,23 @@ namespace BattleShip
         }
         private int Random()
         {
-            Random rnd = new Random();
-            int Rndom = rnd.Next(0, 10);
+            
+            int Rndom = rnd.Next(0, 9);
             return Rndom;
+        }
+        public bool RandomVertical()
+        {
+            
+            int Rndom = rnd.Next(0, 99);
+            if (Rndom < 50)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
         private void LoseLife()
         {
@@ -294,6 +348,52 @@ namespace BattleShip
                     break;
                 }
             }
+        }
+        protected bool VerifyShipPosition(Point ShipPosition, int ShipTiles, bool Vertical)
+        {
+            bool result = true;
+            //Verifying rect in gamearea
+            if (Vertical)
+            {
+              if (ShipPosition.Y + ShipTiles > (TilesHeight-1))
+                {
+                    result = false;
+                }
+            }
+            else
+            {
+                if (ShipPosition.X - ShipTiles + 1 < 0)
+                {
+                    result = false;
+                }
+            }
+            // Verifying ship on top of ship
+            if (result)
+            {
+                if (Vertical)
+                {
+                    for (int i = 0; i < ShipTiles; i++)
+                    {
+                        if (Tiles[ShipPosition.X, ShipPosition.Y + i].HasShip())
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < ShipTiles; i++)
+                    {
+                        if (Tiles[ShipPosition.X - ShipTiles + 1 + i, ShipPosition.Y].HasShip())
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }

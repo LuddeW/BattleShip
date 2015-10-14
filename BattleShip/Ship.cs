@@ -14,27 +14,48 @@ namespace BattleShip
         Texture2D ShipTexture;
         int lives;
         bool isvisible;
-        public Ship(Rectangle ShipRectangle, Texture2D ShipTexture)        
+        float HorizontalValue = 1.57f;
+        float VerticalValue = 0f;
+        bool Vertical;
+        public Ship(Rectangle ShipRectangle, Texture2D ShipTexture, bool Vertical)        
         {
             this.ShipRectangle = ShipRectangle;
-            this.ShipTexture = ShipTexture;            
+            this.ShipTexture = ShipTexture;
+            this.Vertical = Vertical;     
             Console.WriteLine("Ship Created");
             lives = ShipRectangle.Height / 50;
+            
         }
         public void Draw(SpriteBatch sb)
         {
             Visible();
             if (isvisible)
             {
-                sb.Draw(ShipTexture, ShipRectangle, Color.White);
+                if (Vertical)
+                {
+                    Vector2 origin = new Vector2(0, 0);
+                    sb.Draw(ShipTexture, ShipRectangle, null, Color.White, VerticalValue, origin, SpriteEffects.None, 0f);
+                }
+                else
+                {
+                    Vector2 origin = new Vector2 (0, 50);
+                    sb.Draw(ShipTexture, ShipRectangle, null, Color.White, HorizontalValue, origin, SpriteEffects.None, 0f);
+                }
             }
                           
         }
         public bool IsPointInShip(Point Position)
-        {   
-            return ShipRectangle.Contains(Position);
+        {
+            if (Vertical)
+            {
+                return ShipRectangle.Contains(Position);
+            }
+            else
+            {
+                Rectangle Rotated = new Rectangle(ShipRectangle.X + Game1.TILE_SIZE - ShipRectangle.Height, ShipRectangle.Y, ShipRectangle.Height, ShipRectangle.Width);
+                return Rotated.Contains(Position);
+            }
             
-                   
         }
         public void Visible()
         {
@@ -45,7 +66,7 @@ namespace BattleShip
             }
             else
             {
-                isvisible = false;
+                isvisible = true;
             }
         }
         public void LoseLife()
