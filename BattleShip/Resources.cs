@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace BattleShip
 {
-    class Common
+    class Resources
     {
 
         private Texture2D waterTileTexture;
@@ -20,7 +20,29 @@ namespace BattleShip
         private ContentManager content;
         private SpriteFont hudFont;
 
-        public Texture2D WaterTileTexture1
+        public Resources(ContentManager content)
+        {
+            this.content = content;
+        }
+
+        public void LoadPictures()
+        {
+            waterTileTexture = content.Load<Texture2D>(@"watertile");
+            destroyerTexture = content.Load<Texture2D>(@"ship2x2");
+            submarineTexture = content.Load<Texture2D>(@"ship3x3");
+            battleshipTexture = content.Load<Texture2D>(@"ship4x4");
+            hangarshipTexture = content.Load<Texture2D>(@"ship5x5");
+            splash = content.Load<Texture2D>(@"splash");
+            explosion = content.Load<Texture2D>(@"explosion");
+            radar_Sheet = content.Load<Texture2D>(@"radar_spritesheet");
+        }
+
+        public void LoadFonts()
+        {
+            hudFont = content.Load<SpriteFont>(@"HUDFont");
+        }
+
+        public Texture2D WaterTileTexture
         {
             get
             {
@@ -28,7 +50,7 @@ namespace BattleShip
             }
         }
 
-        public Texture2D DestroyerTexture1
+        public Texture2D DestroyerTexture
         {
             get
             {
@@ -91,29 +113,5 @@ namespace BattleShip
                 return hudFont;
             }
         }
-
-        public Common(ContentManager content)
-        {
-            this.content = content;
-        }
-
-        public void LoadPictures()
-        {
-            waterTileTexture = content.Load<Texture2D>(@"watertile");
-            destroyerTexture = content.Load<Texture2D>(@"ship2x2");
-            submarineTexture = content.Load<Texture2D>(@"ship3x3");
-            battleshipTexture = content.Load<Texture2D>(@"ship4x4");
-            hangarshipTexture = content.Load<Texture2D>(@"ship5x5");
-            splash = content.Load<Texture2D>(@"splash");
-            explosion = content.Load<Texture2D>(@"explosion");
-            radar_Sheet = content.Load<Texture2D>(@"radar_spritesheet");
-
-        }
-
-        public void LoadFonts()
-        {
-            hudFont = content.Load<SpriteFont>(@"HUDFont");
-        }
-
     }
 }

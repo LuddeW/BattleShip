@@ -12,45 +12,66 @@ namespace BattleShip
 
         Rectangle ShipRectangle;
         Texture2D ShipTexture;
-        int lives;
-        bool isvisible;
-        public Ship(Rectangle ShipRectangle, Texture2D ShipTexture)        
+        bool[] lifes;
+        bool vertical;
+        public Ship(Rectangle ShipRectangle, Texture2D ShipTexture, bool vertical)        
         {
             this.ShipRectangle = ShipRectangle;
-            this.ShipTexture = ShipTexture;            
+            this.ShipTexture = ShipTexture;
+            this.vertical = vertical;        
             Console.WriteLine("Ship Created");
-            lives = ShipRectangle.Height / 50;
+            if( vertical)
+            {
+                lifes = new bool[ShipRectangle.Height / Game1.TILE_SIZE];
+            }
+            else  // Horizontal
+            {
+                lifes = new bool[ShipRectangle.Width / Game1.TILE_SIZE];
+            }
+            for(int i=0; i<lifes.Length; i++)
+            {
+                lifes[i] = true;
+            }
+
         }
         public void Draw(SpriteBatch sb)
         {
-            Visible();
-            if (isvisible)
+            if (IsVisible())
             {
                 sb.Draw(ShipTexture, ShipRectangle, Color.White);
             }
                           
         }
+
         public bool IsPointInShip(Point Position)
         {   
             return ShipRectangle.Contains(Position);
-            
                    
         }
-        public void Visible()
+        public bool IsVisible()
         {
-            if (lives <= 0)
+            bool isVisible = true;
+            for (int i = 0; i < lifes.Length; i++)
             {
-                isvisible = true;
-                              
+                if(lifes[i])
+                {
+                    isVisible = false;
+                    break;
+                }
+            }
+            return isVisible;
+        }
+
+        public void LoseLife(Point Position)
+        {
+            if(vertical)
+            {
+                lifes[(ShipRectangle.Bottom - Position.Y) / Game1.TILE_SIZE] = false;
             }
             else
             {
-                isvisible = false;
+
             }
-        }
-        public void LoseLife()
-        {
-            lives--;            
         }
     }
 }

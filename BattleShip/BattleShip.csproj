@@ -38,7 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Common.cs" />
+    <Compile Include="GameArea.cs" />
+    <Compile Include="Resources.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="Radar.cs" />
     <Compile Include="Ship.cs" />
