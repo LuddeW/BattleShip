@@ -13,7 +13,7 @@ namespace BattleShip
         Rectangle ShipRectangle;
         Texture2D ShipTexture;
         int lives;
-        bool isvisible;
+        public bool isvisible;
         float HorizontalValue = 1.57f;
         float VerticalValue = 0f;
         bool Vertical;
@@ -66,7 +66,7 @@ namespace BattleShip
             }
             else
             {
-                isvisible = true;
+                isvisible = false;
             }
         }
         public void LoseLife()

@@ -34,3 +34,4 @@ C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\Battle
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\explosion.png
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\splash.png
 C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\radar_spritesheet.xnb
+C:\Users\Ludwig\Desktop\Skola\ObjektorienteradSpelprogramering\Inlämning\BattleShips\BattleShip\BattleShip\bin\Windows\Debug\Content\StartGameFont.xnb

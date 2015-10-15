@@ -24,6 +24,7 @@ namespace BattleShip
         Texture2D Explosion;
         Texture2D Radar_Sheet;
         SpriteFont HudFont;
+        SpriteFont StartFont;
         Tile LastClickedTile = null;
         Tile[,] Tiles;
         Ship[] Ships;
@@ -31,11 +32,18 @@ namespace BattleShip
         Clock Clock = new Clock();
         MouseState PrevMouseState;
         Random rnd;
+        enum GamesState { Startscreen, Gameplay, Settings, EndScreen}
+        GamesState CurrentState = GamesState.Startscreen;
         int Bombs = 0;
         int TilesWidth = 10;
         int TilesHeight = 10;
         int GameAreaWidth;
         int GameAreaHeight;
+        int NumberOfShipsLeft = 5;
+        string Start = "START";
+        string Settings = "SETTINGS";
+        string Back = "BACK";
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -93,7 +101,31 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            HandleMouseInput();
+            switch (CurrentState)
+            {
+                case GamesState.Startscreen:
+                    base.Update(gameTime);
+                    //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
+                    //    CurrentState = GamesState.Gameplay;
+                    StartGame();
+                    break;
+                case GamesState.Gameplay:
+                    HandleMouseInput();
+                    EndGame();
+                    ShipDeathCounter();
+                    base.Update(gameTime);
+                    break;
+                case GamesState.Settings:
+                    SettingMenu();
+                    base.Update(gameTime);
+                    break;
+                case GamesState.EndScreen:
+                    
+                    base.Update(gameTime);
+                    break;
+                default:
+                    break;
+            }
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -108,14 +140,43 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-            DrawWaterTiles();
-            DrawShips();
-            DrawTileStatus();
-            DrawFonts();
-            Radar.Draw(spriteBatch, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
-            spriteBatch.End();
+            switch (CurrentState)
+            {
+                case GamesState.Startscreen:
+                    GraphicsDevice.Clear(Color.Black);
+                    spriteBatch.Begin();
+                    DrawStartGame();
+                    DrawSettings();
+                    spriteBatch.End();
+                    break;
+                case GamesState.Gameplay:
+                    GraphicsDevice.Clear(Color.Black);
+                    spriteBatch.Begin();
+                    DrawWaterTiles();
+                    DrawShips();
+                    DrawTileStatus();
+                    DrawHud();
+                    Radar.Draw(spriteBatch, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
+                    spriteBatch.End();
+                    break;
+                case GamesState.Settings:
+                    GraphicsDevice.Clear(Color.Black);
+                    spriteBatch.Begin();
+                    DrawSettingMenu();
+                    spriteBatch.End();
+                    break;
+                case GamesState.EndScreen:
+                    GraphicsDevice.Clear(Color.Black);
+                    spriteBatch.Begin();
+                    DrawEndGame();
+                    spriteBatch.End();
+                    break;
+                default:
+                    break;
+            }
+            
+           
+            
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
@@ -156,6 +217,7 @@ namespace BattleShip
         private void LoadFonts()
         {
             HudFont = Content.Load<SpriteFont>(@"HUDFont");
+            StartFont = Content.Load<SpriteFont>(@"StartGameFont");
         }
         private void CreatShips()
         {
@@ -212,7 +274,7 @@ namespace BattleShip
                     Ships[i].Draw(spriteBatch);   
             }
         }
-        private void DrawFonts()
+        private void DrawHud()
         {
             string Bomb = "Bombs dropped:" + Bombs;
             spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, 505), Color.White);
@@ -394,6 +456,81 @@ namespace BattleShip
                 }
             }
             return result;
+        }
+        public void StartGame()
+        {
+            Vector2 StartVector = StartFont.MeasureString(Start);
+            Rectangle StartRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)StartVector.X /2, Window.ClientBounds.Height / 2 - (int)StartVector.Y / 2, (int)StartVector.X, (int)StartVector.Y);
+
+            Vector2 SettingsVector = StartFont.MeasureString(Settings);
+            Rectangle SettingsRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)SettingsVector.X / 2, Window.ClientBounds.Height / 2 + (int)SettingsVector.Y, (int)SettingsVector.X, (int)SettingsVector.Y);
+            MouseState mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && StartRectangle.Contains(mouseState.Position))
+            {
+                CurrentState = GamesState.Gameplay;
+            }
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && SettingsRectangle.Contains(mouseState.Position))
+            {
+                CurrentState = GamesState.Settings;
+            }
+                PrevMouseState = mouseState;
+        }
+        public void SettingMenu()
+        {
+            MouseState mouseState = Mouse.GetState();
+            Vector2 SettingsLen = StartFont.MeasureString(Back);
+            Rectangle SettingsRectangle = new Rectangle(0, TILE_SIZE * TilesHeight - (int)SettingsLen.Y + 100, (int)SettingsLen.X, (int)SettingsLen.Y);
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && SettingsRectangle.Contains(mouseState.Position))
+            {
+                CurrentState = GamesState.Startscreen;
+            }
+            PrevMouseState = mouseState;
+        }
+        public void DrawSettingMenu()
+        {
+            Vector2 SettingsLen = StartFont.MeasureString(Back);
+            spriteBatch.DrawString(StartFont, Back, new Vector2(0, TILE_SIZE * TilesHeight - SettingsLen.Y + 100), Color.White);
+        }
+        public void DrawSettings()
+        {
+            Vector2 SettingsLen = StartFont.MeasureString(Settings);
+            spriteBatch.DrawString(StartFont, Settings, new Vector2(Window.ClientBounds.Width / 2 - SettingsLen.X / 2, Window.ClientBounds.Height / 2 + SettingsLen.Y), Color.White);
+        }
+        public void DrawStartGame()
+        {
+            
+            Vector2 StartLen = StartFont.MeasureString(Start);
+            spriteBatch.DrawString(StartFont, Start, new Vector2(Window.ClientBounds.Width / 2 - StartLen.X / 2, Window.ClientBounds.Height / 2 - StartLen.Y / 2), Color.White);
+        }
+        public void EndGame()
+        {
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                if (NumberOfShipsLeft == 0)
+                {
+                    CurrentState = GamesState.EndScreen;
+                }
+            }
+        }
+        public void ShipDeathCounter()
+        {
+            int temp = Ships.Length;
+            for (int i = 0; i < Ships.Length; i++)
+            {
+                if (Ships[i].isvisible)
+                {
+                    temp--;
+                }
+            }
+            NumberOfShipsLeft = temp;
+        }
+        public void DrawEndGame()
+        {
+            string Ended = "You dropped \n" + Bombs + " Bombs";
+            Vector2 EndedLen = StartFont.MeasureString(Ended);
+            spriteBatch.DrawString(StartFont, Ended, new Vector2(Window.ClientBounds.Width / 2 - EndedLen.X / 2, Window.ClientBounds.Height / 2 - EndedLen.Y / 2), Color.White);
+              
         }
     }
 }

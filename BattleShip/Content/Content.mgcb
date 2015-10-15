@@ -107,3 +107,9 @@
 /processorParam:TextureFormat=Color
 /build:radar_spritesheet.png
 
+#begin StartGameFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:StartGameFont.spritefont
+
