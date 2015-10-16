@@ -12,6 +12,7 @@ namespace BattleShip
     {
 
         public const int TILE_SIZE = 50;
+        const int HUD_HEIGHT = 100;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -40,9 +41,12 @@ namespace BattleShip
         int GameAreaWidth;
         int GameAreaHeight;
         int NumberOfShipsLeft = 5;
+        int Init = 0;
         string Start = "START";
         string Settings = "SETTINGS";
         string Back = "BACK";
+        string LeftArrow = "<";
+        string RightArrow = ">";
 
         public Game1()
         {
@@ -62,8 +66,8 @@ namespace BattleShip
             // TODO: Add your initialization logic here
             GameAreaWidth = TilesWidth * TILE_SIZE;
             GameAreaHeight = TilesHeight * TILE_SIZE;
-            graphics.PreferredBackBufferWidth = 500;
-            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferWidth = TILE_SIZE * TilesWidth;
+            graphics.PreferredBackBufferHeight = TILE_SIZE * TilesHeight + HUD_HEIGHT;
             graphics.ApplyChanges();
             rnd = new Random();
 
@@ -105,11 +109,15 @@ namespace BattleShip
             {
                 case GamesState.Startscreen:
                     base.Update(gameTime);
-                    //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
-                    //    CurrentState = GamesState.Gameplay;
                     StartGame();
                     break;
                 case GamesState.Gameplay:
+                    if (Init == 1)
+                    {
+                        Initialize();
+                        Init = 0;
+                    }
+                    
                     HandleMouseInput();
                     EndGame();
                     ShipDeathCounter();
@@ -146,7 +154,6 @@ namespace BattleShip
                     GraphicsDevice.Clear(Color.Black);
                     spriteBatch.Begin();
                     DrawStartGame();
-                    DrawSettings();
                     spriteBatch.End();
                     break;
                 case GamesState.Gameplay:
@@ -193,7 +200,7 @@ namespace BattleShip
         }
         protected void CreatTileArray()
         {
-            Tiles = new Tile[10, 10];
+            Tiles = new Tile[TilesHeight, TilesWidth];
             for (int i = 0; i < Tiles.GetLength(0); i++)
             {
                 for (int k = 0; k < Tiles.GetLength(1); k++)
@@ -277,7 +284,7 @@ namespace BattleShip
         private void DrawHud()
         {
             string Bomb = "Bombs dropped:" + Bombs;
-            spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, 505), Color.White);
+            spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, TILE_SIZE * TilesHeight), Color.White);
         }
         private void HandleMouseInput()
         {
@@ -398,7 +405,7 @@ namespace BattleShip
             }
 
         }
-        private void LoseLife()
+        protected void LoseLife()
         {
             MouseState mouseState = Mouse.GetState();
             for (int i = 0; i < Ships.Length; i++)
@@ -457,7 +464,7 @@ namespace BattleShip
             }
             return result;
         }
-        public void StartGame()
+        protected void StartGame()
         {
             Vector2 StartVector = StartFont.MeasureString(Start);
             Rectangle StartRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)StartVector.X /2, Window.ClientBounds.Height / 2 - (int)StartVector.Y / 2, (int)StartVector.X, (int)StartVector.Y);
@@ -468,6 +475,7 @@ namespace BattleShip
             if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && StartRectangle.Contains(mouseState.Position))
             {
                 CurrentState = GamesState.Gameplay;
+                Init = 1;
             }
             if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && SettingsRectangle.Contains(mouseState.Position))
             {
@@ -475,35 +483,78 @@ namespace BattleShip
             }
                 PrevMouseState = mouseState;
         }
-        public void SettingMenu()
+        protected void SettingMenu()
         {
             MouseState mouseState = Mouse.GetState();
-            Vector2 SettingsLen = StartFont.MeasureString(Back);
-            Rectangle SettingsRectangle = new Rectangle(0, TILE_SIZE * TilesHeight - (int)SettingsLen.Y + 100, (int)SettingsLen.X, (int)SettingsLen.Y);
+            Vector2 BackLen = StartFont.MeasureString(Back);
+            Rectangle SettingsRectangle = new Rectangle(0, 500 - (int)BackLen.Y + HUD_HEIGHT, (int)BackLen.X, (int)BackLen.Y);
 
             if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && SettingsRectangle.Contains(mouseState.Position))
             {
                 CurrentState = GamesState.Startscreen;
             }
+            HandleLeftArrow();
+            HandleRightArrow();
             PrevMouseState = mouseState;
+
         }
-        public void DrawSettingMenu()
+        protected void HandleLeftArrow()
         {
-            Vector2 SettingsLen = StartFont.MeasureString(Back);
-            spriteBatch.DrawString(StartFont, Back, new Vector2(0, TILE_SIZE * TilesHeight - SettingsLen.Y + 100), Color.White);
+            MouseState mouseState = Mouse.GetState();
+            string BoardSize = TilesWidth + "X" + TilesHeight;
+            Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
+            Vector2 LeftArrowLen = StartFont.MeasureString(LeftArrow);
+            Rectangle LeftArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)BoardSizeLen.X / 2 - (int)LeftArrowLen.X * 2, Window.ClientBounds.Height / 2 - (int)BoardSizeLen.Y / 2, (int)LeftArrowLen.X, (int)LeftArrowLen.Y);
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && LeftArrowRectangle.Contains(mouseState.Position))
+            {
+                //Problem
+                if (TilesWidth > 8 && TilesHeight > 8 && TilesWidth <= 14 && TilesHeight <= 14)
+                {
+                    TilesWidth--;
+                    TilesHeight--;
+                }
+            }
         }
-        public void DrawSettings()
+        protected void HandleRightArrow()
         {
-            Vector2 SettingsLen = StartFont.MeasureString(Settings);
-            spriteBatch.DrawString(StartFont, Settings, new Vector2(Window.ClientBounds.Width / 2 - SettingsLen.X / 2, Window.ClientBounds.Height / 2 + SettingsLen.Y), Color.White);
+            MouseState mouseState = Mouse.GetState();
+            string BoardSize = TilesWidth + "X" + TilesHeight;
+            Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
+            Vector2 RightArrowLen = StartFont.MeasureString(LeftArrow);
+            Rectangle RightArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 + (int)BoardSizeLen.X / 2 + (int)RightArrowLen.X, Window.ClientBounds.Height / 2 - (int)BoardSizeLen.Y / 2, (int)RightArrowLen.X, (int)RightArrowLen.Y);
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && RightArrowRectangle.Contains(mouseState.Position))
+            {
+                if (TilesWidth >= 8 && TilesHeight >= 8 && TilesWidth < 14 && TilesHeight < 14)
+                {
+                    TilesWidth++;
+                    TilesHeight++;
+                }
+            }
         }
-        public void DrawStartGame()
+
+        protected void DrawSettingMenu()
+        {
+            Vector2 BackLen = StartFont.MeasureString(Back);
+            spriteBatch.DrawString(StartFont, Back, new Vector2(0, 500 - BackLen.Y + 100), Color.White);
+            string BoardSize = TilesWidth + "X" + TilesHeight;
+            Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
+            spriteBatch.DrawString(StartFont, BoardSize, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
+            Vector2 LeftArrowLen = StartFont.MeasureString(LeftArrow);
+            spriteBatch.DrawString(StartFont, LeftArrow, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2 - LeftArrowLen.X * 2, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
+            Vector2 RightArrowLen = StartFont.MeasureString(RightArrow);
+            spriteBatch.DrawString(StartFont, RightArrow, new Vector2(Window.ClientBounds.Width / 2 + BoardSizeLen.X / 2 + RightArrowLen.X, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
+        }
+        protected void DrawStartGame()
         {
             
             Vector2 StartLen = StartFont.MeasureString(Start);
             spriteBatch.DrawString(StartFont, Start, new Vector2(Window.ClientBounds.Width / 2 - StartLen.X / 2, Window.ClientBounds.Height / 2 - StartLen.Y / 2), Color.White);
+            Vector2 SettingsLen = StartFont.MeasureString(Settings);
+            spriteBatch.DrawString(StartFont, Settings, new Vector2(Window.ClientBounds.Width / 2 - SettingsLen.X / 2, Window.ClientBounds.Height / 2 + SettingsLen.Y), Color.White);
         }
-        public void EndGame()
+        protected void EndGame()
         {
             for (int i = 0; i < Ships.Length; i++)
             {
@@ -513,7 +564,7 @@ namespace BattleShip
                 }
             }
         }
-        public void ShipDeathCounter()
+        protected void ShipDeathCounter()
         {
             int temp = Ships.Length;
             for (int i = 0; i < Ships.Length; i++)
@@ -525,7 +576,7 @@ namespace BattleShip
             }
             NumberOfShipsLeft = temp;
         }
-        public void DrawEndGame()
+        protected void DrawEndGame()
         {
             string Ended = "You dropped \n" + Bombs + " Bombs";
             Vector2 EndedLen = StartFont.MeasureString(Ended);
