@@ -17,7 +17,6 @@ namespace BattleShip
         Ship ship = null;
         public bool Clicked;
         public bool Explos ;
-        
 
         public Tile(Rectangle TileRectangle, Texture2D WaterTile, Texture2D Explosion, Texture2D Splash)
         {
@@ -52,13 +51,38 @@ namespace BattleShip
             
         }
 
-        public void SetShip(Ship ship)
-        {
-            this.ship = ship;
-        }
         public bool HasShip()
         {
-            return ship != null;
+            return Ship != null;
+        }
+
+        public Ship Ship
+        {
+            get
+            {
+                return ship;
+            }
+
+            set
+            {
+                ship = value;
+            }
+        }
+
+        // Returns true if first hit
+        public bool HitTile()
+        {
+            bool result = !Clicked;
+            if(!Clicked)
+            {
+                if(HasShip())
+                {
+                    Explos = true;
+                    ship.LoseLife();
+                }
+            }
+            Clicked = true;
+            return result;
         }
     }
 }

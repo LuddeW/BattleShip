@@ -35,10 +35,9 @@ namespace BattleShip
         enum GamesState { Startscreen, Gameplay, Settings, EndScreen}
         GamesState CurrentState = GamesState.Startscreen;
         int Bombs = 0;
-        int TilesWidth = 10;
+        int TilesWidth = 20;
         int TilesHeight = 10;
-        int GameAreaWidth;
-        int GameAreaHeight;
+        Rectangle GameAreaRectangle = new Rectangle();
         int NumberOfShipsLeft = 5;
         string Start = "START";
         string Settings = "SETTINGS";
@@ -60,10 +59,12 @@ namespace BattleShip
         {
             IsMouseVisible = true;
             // TODO: Add your initialization logic here
-            GameAreaWidth = TilesWidth * TILE_SIZE;
-            GameAreaHeight = TilesHeight * TILE_SIZE;
-            graphics.PreferredBackBufferWidth = 500;
-            graphics.PreferredBackBufferHeight = 600;
+            GameAreaRectangle.X = 0;
+            GameAreaRectangle.Y = 0;
+            GameAreaRectangle.Width = TilesWidth * TILE_SIZE;
+            GameAreaRectangle.Height = TilesHeight * TILE_SIZE;
+            graphics.PreferredBackBufferWidth = GameAreaRectangle.Width;
+            graphics.PreferredBackBufferHeight = GameAreaRectangle.Height + 100;
             graphics.ApplyChanges();
             rnd = new Random();
 
@@ -81,7 +82,7 @@ namespace BattleShip
             LoadPictures();
             LoadFonts();
             CreatTileArray();
-            CreatShips();
+            CreateShips();
             // TODO: use this.Content to load your game content here
         }
 
@@ -193,7 +194,7 @@ namespace BattleShip
         }
         protected void CreatTileArray()
         {
-            Tiles = new Tile[10, 10];
+            Tiles = new Tile[TilesWidth, TilesHeight];
             for (int i = 0; i < Tiles.GetLength(0); i++)
             {
                 for (int k = 0; k < Tiles.GetLength(1); k++)
@@ -219,7 +220,7 @@ namespace BattleShip
             HudFont = Content.Load<SpriteFont>(@"HUDFont");
             StartFont = Content.Load<SpriteFont>(@"StartGameFont");
         }
-        private void CreatShips()
+        private void CreateShips()
         {
             
             Texture2D[] ConfigShip = new Texture2D[]
@@ -234,8 +235,8 @@ namespace BattleShip
                 Point Point = new Point();
                 while (!FoundPosition)
                 {
-                    Point.X = Random();
-                    Point.Y = Random();
+                    Point.X = RandomTile(false);
+                    Point.Y = RandomTile(true);
                     FoundPosition = VerifyShipPosition(Point, ConfigShip[i].Height/TILE_SIZE, TempVertical);
                 }
                 
@@ -253,22 +254,20 @@ namespace BattleShip
             {
                 for (int i = 0; i < ShipTiles; i++)
                 {
-                    Tiles[Point.X, Point.Y + i].SetShip(ship);
+                    Tiles[Point.X, Point.Y + i].Ship = ship;
                 }
             }
             else
             {
                 for (int i = 0; i < ShipTiles; i++)
                 {
-                    Tiles[Point.X - ShipTiles + 1 + i, Point.Y].SetShip(ship);
+                    Tiles[Point.X - ShipTiles + 1 + i, Point.Y].Ship = ship;
                 }
             }
         }
 
         private void DrawShips()
         {
-            
-            
             for (int i = 0; i < Ships.Length; i++)
             {                
                     Ships[i].Draw(spriteBatch);   
@@ -279,85 +278,35 @@ namespace BattleShip
             string Bomb = "Bombs dropped:" + Bombs;
             spriteBatch.DrawString(HudFont, Bomb, new Vector2(5, 505), Color.White);
         }
+
         private void HandleMouseInput()
         {
             MouseState mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && IsPointInAnyTile(mouseState.Position))
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && GameAreaRectangle.Contains(mouseState.Position))
             {
                 LastClickedTile = GetTileWithPointInside(mouseState.Position);
-                if (!LastClickedTile.Clicked)
+                if(LastClickedTile!=null)
                 {
-                    Bombs++;
-                }                             
-                if (IsPointInAnyShip(mouseState.Position))
-                {
-                    if (!LastClickedTile.Clicked)
+                    if (LastClickedTile.HitTile())
                     {
-                        
-                        LastClickedTile.Explos = true;
-                        LoseLife();
-                    }
-                }   
-                else
-                {
-                    LastClickedTile.Explos = false;
+                        Bombs++;
+                    }                             
                 }
-                LastClickedTile.Clicked = true;
             }
             PrevMouseState = mouseState;
         }
-        private bool IsPointInAnyShip(Point Point)
-        {
 
-            for (int i = 0; i < Ships.Length; i++)
-            {
-                if (Ships[i].IsPointInShip(Point))
-                {
-                   return true;
-                }
-            }
-            return false;
-        }
-        private Ship GetShipWithPointInsideIt(Point Point)
-        {
-            for (int i = 0; i < Ships.Length; i++)
-            {
-                if (Ships[i].IsPointInShip(Point))
-                {
-                    return Ships[i] ;
-
-                }
-            }
-            return null;
-        }
-        private bool IsPointInAnyTile(Point Point)
-        {
-            for (int i = 0; i < Tiles.GetLength(0); i++)
-            {
-                for (int k = 0; k < Tiles.GetLength(1); k++)
-                {
-                    if (Tiles[i,k].IsPointInTile(Point))
-                    {
-                        return true;
-                    }                   
-                }
-            }
-            return false;
-        }
         private Tile GetTileWithPointInside(Point Point)
         {
-            for (int i = 0; i < Tiles.GetLength(0); i++)
+            if (GameAreaRectangle.Contains(Point))
             {
-                for (int k = 0; k < Tiles.GetLength(1); k++)
-                {
-                    if (Tiles[i,k].IsPointInTile(Point))
-                    {
-                        return Tiles[i, k];
-                    }
-                }
+                int tileX = (TilesWidth - 1) - (GameAreaRectangle.Right - Point.X) / TILE_SIZE;
+                int tileY = (TilesHeight - 1) - (GameAreaRectangle.Bottom - Point.Y) / TILE_SIZE;
+                return Tiles[tileX, tileY];
             }
             return null;
         }
+
         private void DrawTileStatus()
         {
             for (int i = 0; i < Tiles.GetLength(0); i++)
@@ -378,39 +327,22 @@ namespace BattleShip
                 }
             }         
         }
-        private int Random()
+        private int RandomTile(bool vertical)
         {
-            
-            int Rndom = rnd.Next(0, 9);
-            return Rndom;
+            int tiles = TilesWidth;
+            if(vertical)
+            {
+                tiles = TilesHeight;
+            }
+            return rnd.Next(0, tiles);
         }
+
         public bool RandomVertical()
         {
-            
             int Rndom = rnd.Next(0, 99);
-            if (Rndom < 50)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return Rndom < 50;
+        }
 
-        }
-        private void LoseLife()
-        {
-            MouseState mouseState = Mouse.GetState();
-            for (int i = 0; i < Ships.Length; i++)
-            {
-                if (IsPointInAnyShip(mouseState.Position))
-                {
-                    GetShipWithPointInsideIt(mouseState.Position).LoseLife();
-                    Console.WriteLine(i);
-                    break;
-                }
-            }
-        }
         protected bool VerifyShipPosition(Point ShipPosition, int ShipTiles, bool Vertical)
         {
             bool result = true;
