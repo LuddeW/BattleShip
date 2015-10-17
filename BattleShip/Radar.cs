@@ -10,10 +10,7 @@ namespace BattleShip
     class Radar
     {
         Clock Clock = new Clock();
-        public Radar()
-        {
-               
-        }
+
         public void Draw(SpriteBatch sb, Texture2D Radar_Sheet, Rectangle Pos, int Rotation)
         {
             sb.Draw(Radar_Sheet, Pos,
