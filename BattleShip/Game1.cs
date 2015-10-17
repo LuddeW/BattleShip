@@ -12,6 +12,7 @@ namespace BattleShip
     {
 
         public const int TILE_SIZE = 50;
+        public const int GAMEA_AREA_SPACE = 25;
         const int HUD_HEIGHT = 100;
 
         GraphicsDeviceManager graphics;
@@ -79,7 +80,8 @@ namespace BattleShip
         string Back = "BACK";
         string LeftArrow = "<";
         string RightArrow = ">";
-        GameArea gameArea;
+        GameArea gameArea1;
+        GameArea gameArea2;
         MouseState PrevMouseState = Mouse.GetState();
 
         public Game1()
@@ -101,9 +103,10 @@ namespace BattleShip
             // TODO: Add your initialization logic here
             rnd = new Random();
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            gameArea = new GameArea(0, 0, TilesWidth, TilesHeight, spriteBatch, rnd);
-            graphics.PreferredBackBufferWidth = gameArea.Width;
-            graphics.PreferredBackBufferHeight = gameArea.Height + HUD_HEIGHT;
+            gameArea1 = new GameArea(0, 0, TilesWidth, TilesHeight, spriteBatch, rnd);
+            gameArea2 = new GameArea(gameArea1.Width + GAMEA_AREA_SPACE, 0, TilesWidth, TilesHeight, spriteBatch, rnd);
+            graphics.PreferredBackBufferWidth = gameArea1.Width + GAMEA_AREA_SPACE + gameArea2.Width;
+            graphics.PreferredBackBufferHeight = gameArea1.Height + HUD_HEIGHT;
             graphics.ApplyChanges();
  
             base.Initialize();
@@ -118,7 +121,8 @@ namespace BattleShip
             // Create a new SpriteBatch, which can be used to draw textures.
             LoadPictures();
             LoadFonts();
-            gameArea.Create();
+            gameArea1.Create();
+            gameArea2.Create();
             // TODO: use this.Content to load your game content here
         }
 
@@ -152,8 +156,9 @@ namespace BattleShip
                         Init = 0;
                     }
                     
-                    gameArea.HandleMouseInput(mouseState, PrevMouseState);
-                    if( gameArea.EndGame())
+                    gameArea1.HandleMouseInput(mouseState, PrevMouseState);
+                    gameArea2.HandleMouseInput(mouseState, PrevMouseState);
+                    if (gameArea1.EndGame() | gameArea2.EndGame())
                     {
                         CurrentState = GamesState.EndScreen;
                     }
@@ -196,7 +201,8 @@ namespace BattleShip
                 case GamesState.Gameplay:
                     GraphicsDevice.Clear(Color.Black);
                     spriteBatch.Begin();
-                    gameArea.Draw();
+                    gameArea1.Draw();
+                    gameArea2.Draw();
                     Radar.Draw(spriteBatch, radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
                     spriteBatch.End();
                     break;
@@ -327,7 +333,7 @@ namespace BattleShip
 
         protected void DrawEndGame()
         {
-            string Ended = "You dropped \n" + gameArea.Bombs + " Bombs";
+            string Ended = "# dropped bombs:" + gameArea2.Bombs;
             Vector2 EndedLen = startFont.MeasureString(Ended);
             spriteBatch.DrawString(startFont, Ended, new Vector2(Window.ClientBounds.Width / 2 - EndedLen.X / 2, Window.ClientBounds.Height / 2 - EndedLen.Y / 2), Color.White);
               
