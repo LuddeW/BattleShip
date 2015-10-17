@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
 
 namespace BattleShip
 {
@@ -40,7 +41,7 @@ namespace BattleShip
         int TilesHeight = 10;
         int GameAreaWidth;
         int GameAreaHeight;
-        int NumberOfShipsLeft = 5;
+        int NumberOfShipsLeft = 4;
         int Init = 0;
         string Start = "START";
         string Settings = "SETTINGS";
@@ -159,8 +160,8 @@ namespace BattleShip
                 case GamesState.Gameplay:
                     GraphicsDevice.Clear(Color.Black);
                     spriteBatch.Begin();
-                    DrawWaterTiles();
-                    DrawShips();
+                    DrawWaterTiles();                    
+                    DrawShips();                    
                     DrawTileStatus();
                     DrawHud();
                     Radar.Draw(spriteBatch, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
@@ -229,29 +230,32 @@ namespace BattleShip
         private void CreatShips()
         {
             
-            Texture2D[] ConfigShip = new Texture2D[]
+                Texture2D[] ConfigShip = new Texture2D[]
             {
-                DestroyerTexture, SubmarineTexture, BattleshipTexture, HangarshipTexture, DestroyerTexture
+                HangarshipTexture, BattleshipTexture, SubmarineTexture, DestroyerTexture, SubmarineTexture,
+                BattleshipTexture, DestroyerTexture
             };
-            Ships = new Ship[ConfigShip.Length];
-            for (int i = 0; i < ConfigShip.Length; i++)
-            {
-                bool FoundPosition = false;
-                bool TempVertical = RandomVertical();
-                Point Point = new Point();
-                while (!FoundPosition)
+                ConfigShip = ConfigShip.Take(NumberOfShipsLeft).ToArray();
+                Ships = new Ship[ConfigShip.Length];
+                for (int i = 0; i < ConfigShip.Length; i++)
                 {
-                    Point.X = Random();
-                    Point.Y = Random();
-                    FoundPosition = VerifyShipPosition(Point, ConfigShip[i].Height/TILE_SIZE, TempVertical);
+                    bool FoundPosition = false;
+                    bool TempVertical = RandomVertical();
+                    Point Point = new Point();
+                    while (!FoundPosition)
+                    {
+                        Point.X = Random();
+                        Point.Y = Random();
+                        FoundPosition = VerifyShipPosition(Point, ConfigShip[i].Height / TILE_SIZE, TempVertical);
+                    }
+
+                    Rectangle TempRectangle = new Rectangle(Point.X * TILE_SIZE, Point.Y * TILE_SIZE, ConfigShip[i].Width, ConfigShip[i].Height);
+
+                    Ship ship = new Ship(TempRectangle, ConfigShip[i], TempVertical);
+                    Ships.SetValue(ship, i);
+                    AddShipToTiles(ship, Point, TempVertical, ConfigShip[i].Height / TILE_SIZE);
                 }
-                
-                Rectangle TempRectangle = new Rectangle(Point.X * TILE_SIZE, Point.Y * TILE_SIZE, ConfigShip[i].Width, ConfigShip[i].Height);
-                
-                Ship ship = new Ship(TempRectangle, ConfigShip[i], TempVertical);
-                Ships.SetValue(ship, i);
-                AddShipToTiles(ship, Point, TempVertical, ConfigShip[i].Height / TILE_SIZE);
-            }
+            
         }
 
         private void AddShipToTiles (Ship ship, Point Point, bool Vertical, int ShipTiles)
@@ -503,16 +507,27 @@ namespace BattleShip
             MouseState mouseState = Mouse.GetState();
             string BoardSize = TilesWidth + "X" + TilesHeight;
             Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
-            Vector2 LeftArrowLen = StartFont.MeasureString(LeftArrow);
-            Rectangle LeftArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)BoardSizeLen.X / 2 - (int)LeftArrowLen.X * 2, Window.ClientBounds.Height / 2 - (int)BoardSizeLen.Y / 2, (int)LeftArrowLen.X, (int)LeftArrowLen.Y);
 
-            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && LeftArrowRectangle.Contains(mouseState.Position))
+            string NumberOfShips = "Ships" + NumberOfShipsLeft;
+            Vector2 NumberOfShipsLen = StartFont.MeasureString(NumberOfShips);
+            Vector2 LeftBoardArrowLen = StartFont.MeasureString(LeftArrow);
+
+            Rectangle LeftShipArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)NumberOfShipsLen.X / 2 - (int)LeftBoardArrowLen.X * 2, Window.ClientBounds.Height / 2 - (int)NumberOfShipsLen.Y / 2, (int)NumberOfShipsLen.X, (int)NumberOfShipsLen.Y);
+            Rectangle LeftBoardArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)BoardSizeLen.X / 2 - (int)LeftBoardArrowLen.X * 2, Window.ClientBounds.Height / 2 + (int)BoardSizeLen.Y / 2, (int)LeftBoardArrowLen.X, (int)LeftBoardArrowLen.Y);
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && LeftBoardArrowRectangle.Contains(mouseState.Position))
             {
-                //Problem
                 if (TilesWidth > 8 && TilesHeight > 8 && TilesWidth <= 14 && TilesHeight <= 14)
                 {
                     TilesWidth--;
                     TilesHeight--;
+                }
+            }
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && LeftShipArrowRectangle.Contains(mouseState.Position))
+            {
+                if (NumberOfShipsLeft > 4 && NumberOfShipsLeft > 4 && NumberOfShipsLeft <= 7 && NumberOfShipsLeft <= 7)
+                {
+                    NumberOfShipsLeft--;
                 }
             }
         }
@@ -521,15 +536,26 @@ namespace BattleShip
             MouseState mouseState = Mouse.GetState();
             string BoardSize = TilesWidth + "X" + TilesHeight;
             Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
-            Vector2 RightArrowLen = StartFont.MeasureString(LeftArrow);
-            Rectangle RightArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 + (int)BoardSizeLen.X / 2 + (int)RightArrowLen.X, Window.ClientBounds.Height / 2 - (int)BoardSizeLen.Y / 2, (int)RightArrowLen.X, (int)RightArrowLen.Y);
+            string NumberOfShips = "Ships" + NumberOfShipsLeft;
+            Vector2 NumberOfShipsLen = StartFont.MeasureString(NumberOfShips);
+            Vector2 RightShipArrowLen = StartFont.MeasureString(LeftArrow);
 
-            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && RightArrowRectangle.Contains(mouseState.Position))
+            Rectangle RightShipArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 + (int)NumberOfShipsLen.X / 2 + (int)RightShipArrowLen.X, Window.ClientBounds.Height / 2 - (int)NumberOfShipsLen.Y / 2, (int)NumberOfShipsLen.X, (int)NumberOfShipsLen.Y);
+            Rectangle RightBoardArrowRectangle = new Rectangle(Window.ClientBounds.Width / 2 + (int)BoardSizeLen.X / 2 + (int)RightShipArrowLen.X, Window.ClientBounds.Height / 2 + (int)BoardSizeLen.Y / 2, (int)RightShipArrowLen.X, (int)RightShipArrowLen.Y);
+
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && RightBoardArrowRectangle.Contains(mouseState.Position))
             {
                 if (TilesWidth >= 8 && TilesHeight >= 8 && TilesWidth < 14 && TilesHeight < 14)
                 {
                     TilesWidth++;
                     TilesHeight++;
+                }
+            }
+            if (mouseState.LeftButton == ButtonState.Released && PrevMouseState.LeftButton == ButtonState.Pressed && RightShipArrowRectangle.Contains(mouseState.Position))
+            {
+                if (NumberOfShipsLeft >= 4 && NumberOfShipsLeft >= 4 && NumberOfShipsLeft < 7 && NumberOfShipsLeft < 7)
+                {
+                    NumberOfShipsLeft++;
                 }
             }
         }
@@ -540,11 +566,18 @@ namespace BattleShip
             spriteBatch.DrawString(StartFont, Back, new Vector2(0, 500 - BackLen.Y + 100), Color.White);
             string BoardSize = TilesWidth + "X" + TilesHeight;
             Vector2 BoardSizeLen = StartFont.MeasureString(BoardSize);
-            spriteBatch.DrawString(StartFont, BoardSize, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
-            Vector2 LeftArrowLen = StartFont.MeasureString(LeftArrow);
-            spriteBatch.DrawString(StartFont, LeftArrow, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2 - LeftArrowLen.X * 2, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
-            Vector2 RightArrowLen = StartFont.MeasureString(RightArrow);
-            spriteBatch.DrawString(StartFont, RightArrow, new Vector2(Window.ClientBounds.Width / 2 + BoardSizeLen.X / 2 + RightArrowLen.X, Window.ClientBounds.Height / 2 - BoardSizeLen.Y / 2), Color.White);
+            spriteBatch.DrawString(StartFont, BoardSize, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2, Window.ClientBounds.Height / 2 + BoardSizeLen.Y / 2), Color.White);
+            string NumberOfShips = "Ships:" + NumberOfShipsLeft;
+            Vector2 NumberOfShipsLen = StartFont.MeasureString(NumberOfShips);
+            spriteBatch.DrawString(StartFont, NumberOfShips, new Vector2(Window.ClientBounds.Width / 2 - NumberOfShipsLen.X / 2, Window.ClientBounds.Height / 2 - NumberOfShipsLen.Y / 2), Color.White);
+            Vector2 LeftBoardArrowLen = StartFont.MeasureString(LeftArrow);
+            spriteBatch.DrawString(StartFont, LeftArrow, new Vector2(Window.ClientBounds.Width / 2 - BoardSizeLen.X / 2 - LeftBoardArrowLen.X * 2, Window.ClientBounds.Height / 2 + BoardSizeLen.Y / 2), Color.White);
+            Vector2 LeftShipArrowLen = StartFont.MeasureString(LeftArrow);
+            spriteBatch.DrawString(StartFont, LeftArrow, new Vector2(Window.ClientBounds.Width / 2 - NumberOfShipsLen.X / 2 - LeftBoardArrowLen.X * 2, Window.ClientBounds.Height / 2 - NumberOfShipsLen.Y / 2), Color.White);
+            Vector2 RightShipArrowLen = StartFont.MeasureString(LeftArrow);
+            spriteBatch.DrawString(StartFont, RightArrow, new Vector2(Window.ClientBounds.Width / 2 + NumberOfShipsLen.X / 2 + RightShipArrowLen.X, Window.ClientBounds.Height / 2 - NumberOfShipsLen.Y / 2), Color.White);
+            Vector2 RightBoardArrowLen = StartFont.MeasureString(RightArrow);
+            spriteBatch.DrawString(StartFont, RightArrow, new Vector2(Window.ClientBounds.Width / 2 + BoardSizeLen.X / 2 + RightBoardArrowLen.X, Window.ClientBounds.Height / 2 + BoardSizeLen.Y / 2), Color.White);
         }
         protected void DrawStartGame()
         {
