@@ -52,7 +52,7 @@ namespace BattleShip
             }
             else
             {
-                Rectangle Rotated = new Rectangle(ShipRectangle.X + Game1.TILE_SIZE - ShipRectangle.Height, ShipRectangle.Y, ShipRectangle.Height, ShipRectangle.Width);
+                Rectangle Rotated = new Rectangle(ShipRectangle.X + BattleShipGame.TILE_SIZE - ShipRectangle.Height, ShipRectangle.Y, ShipRectangle.Height, ShipRectangle.Width);
                 return Rotated.Contains(Position);
             }
             
