@@ -212,7 +212,7 @@ namespace BattleShip.Screens
 
         public void DrawRadar(SpriteBatch sb)
         {
-          //  Radar.Draw(sb, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
+            Radar.Draw(sb, Radar_Sheet, new Rectangle(Game.Window.ClientBounds.Width / 2 - 50, Game.Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
         }
 
         private bool IsPointInAnyTile(Point Point)
