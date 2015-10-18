@@ -110,7 +110,7 @@ namespace BattleShip
             {
                 case GamesState.Startscreen:
                     base.Update(gameTime);
-                    StartGame();
+                    UpdateStartMenu();
                     break;
                 case GamesState.Gameplay:
                     if (Init == 1)
@@ -149,42 +149,32 @@ namespace BattleShip
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Begin();
             switch (CurrentState)
             {
                 case GamesState.Startscreen:
-                    GraphicsDevice.Clear(Color.Black);
-                    spriteBatch.Begin();
-                    DrawStartGame();
-                    spriteBatch.End();
+                    DrawStartMenu();
                     break;
                 case GamesState.Gameplay:
-                    GraphicsDevice.Clear(Color.Black);
-                    spriteBatch.Begin();
                     DrawWaterTiles();                    
                     DrawShips();                    
                     DrawTileStatus();
                     DrawHud();
                     Radar.Draw(spriteBatch, Radar_Sheet, new Rectangle(Window.ClientBounds.Width / 2 - 50, Window.ClientBounds.Height - 100, 100, 100), Clock.GetRotationForRadar());
-                    spriteBatch.End();
                     break;
                 case GamesState.Settings:
-                    GraphicsDevice.Clear(Color.Black);
-                    spriteBatch.Begin();
                     DrawSettingMenu();
-                    spriteBatch.End();
                     break;
                 case GamesState.EndScreen:
-                    GraphicsDevice.Clear(Color.Black);
-                    spriteBatch.Begin();
                     DrawEndGame();
-                    spriteBatch.End();
                     break;
                 default:
                     break;
             }
-            
-           
-            
+            spriteBatch.End();
+
+
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
@@ -468,7 +458,7 @@ namespace BattleShip
             }
             return result;
         }
-        protected void StartGame()
+        protected void UpdateStartMenu()
         {
             Vector2 StartVector = StartFont.MeasureString(Start);
             Rectangle StartRectangle = new Rectangle(Window.ClientBounds.Width / 2 - (int)StartVector.X /2, Window.ClientBounds.Height / 2 - (int)StartVector.Y / 2, (int)StartVector.X, (int)StartVector.Y);
@@ -579,7 +569,7 @@ namespace BattleShip
             Vector2 RightBoardArrowLen = StartFont.MeasureString(RightArrow);
             spriteBatch.DrawString(StartFont, RightArrow, new Vector2(Window.ClientBounds.Width / 2 + BoardSizeLen.X / 2 + RightBoardArrowLen.X, Window.ClientBounds.Height / 2 + BoardSizeLen.Y / 2), Color.White);
         }
-        protected void DrawStartGame()
+        protected void DrawStartMenu()
         {
             
             Vector2 StartLen = StartFont.MeasureString(Start);
